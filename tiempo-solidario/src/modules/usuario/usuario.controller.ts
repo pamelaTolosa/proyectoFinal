@@ -1,33 +1,26 @@
-import { Controller, Get, Param, Put,Post,Delete,Body } from "@nestjs/common";
+import { Controller, Get, Param, Put, Post, Delete, Body } from "@nestjs/common";
 import { UsuarioService } from "./usuario.service";
-import { Usuario } from "./entities/usuario.entity";
+import { CreateUsuarioDto } from "./dto/create-usuario.dto";
+
 //acá declaramos los verbos http y los métodos que van a llamar a los servicios correspondientes, también se declaran las rutas para cada uno de ellos
-@Controller('/usuario')
+@Controller('/usuarios')
 export class UsuarioController {
 
-  private readonly usuarioService: UsuarioService;
+ constructor(private readonly usuarioService: UsuarioService) {
 
-  constructor(usuarioService: UsuarioService) {
-    this.usuarioService = usuarioService;
-  }
+    this.usuarioService = usuarioService;
+  }
 
-  @Get()//obtener
-  getController(): Promise<Usuario[]> {
-    return this.usuarioService.getService();
-  }
-
-  @Post()//agregar
-  postController(@Body() user: Usuario){
-    return this.usuarioService.postService(user);
-  }
-
-  @Delete(':id')//eliminar
-  deleteController(@Param('id')idUser: number){
-    return this.usuarioService.deleteService(idUser);
-  }
-
-  @Put()//modificar
-  putController(@Body()updateUser: Usuario){
-    return this.usuarioService.putService(updateUser);
-  }
+  @Get()
+  getController() {
+    return this.usuarioService.getService();
+  }
+  @Post()
+  postController(@Body() user: CreateUsuarioDto) {
+    return this.usuarioService.postService(user);
+  }
+@Get(':id/saldo')
+getSaldo(@Param('id') id: number) {
+  return this.usuarioService.getSaldo(id);
+}
 }
