@@ -1,49 +1,60 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import{ RegistroHoras } from '../registro-horas/entities/registro-horas.entity';
+
 import { Usuario } from './entities/usuario.entity';
-import { Controller, Get, Post, Delete, Put, Body, Param } from '@nestjs/common';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
 
-
-
-Injectable()
+@Injectable()
 export class UsuarioService {
-  constructor(
-    @InjectRepository(Usuario)
-    private usersRepository: Repository<Usuario>,
-  ) {}
 
+constructor(
+  @InjectRepository(Usuario)
+  private usersRepository: Repository<Usuario>,
 
+  @InjectRepository(RegistroHoras) 
+  private registroRepository: Repository<RegistroHoras>,
+) {}
 
-  getService(): Promise<Usuario[]> {
-    return this.usersRepository.find();
-  }
+  async getService(): Promise<Usuario[]> {
+    return this.usersRepository.find({
+      relations: ['registrosEmitidos', 'registrosRecibidos'], 
+    });
+  }
 
- async postService(user: Usuario): Promise<Usuario> {
-return this.usersRepository.save(user)
-  }
+ async postService(userDto: CreateUsuarioDto) {
 
+  const existing = await this.usersRepository.findOneBy({
+    correo: userDto.correo,
+  });
 
+  if (existing) {
+    throw new ConflictException('El correo ya está registrado');
+  }
 
-  async deleteService(id: number): Promise<string> {
-   const result = await this.usersRepository.delete(id);
+  const user = this.usersRepository.create(userDto);
+  return this.usersRepository.save(user);
 
-    if (result.affected === 0) {
-      return 'Usuario no encontrado';
-    }
-
-    return 'Usuario eliminado';
-  }
-
-  async putService(@Body() updateUser: Usuario): Promise<string> {
-    const user = await this.usersRepository.findOneBy({ id: updateUser.id });
-
-  if (!user) {
-    return 'Usuario no encontrado!';
-  }
-
-  await this.usersRepository.update(updateUser.id, updateUser);
-
-  return 'Usuario actualizado correctamente!';
 }
-  }
+ async getSaldo(usuarioId: number): Promise<number> {
+
+  const registros = await this.registroRepository.find({
+    relations: ['emisor', 'receptor'],
+  });
+
+  return registros.reduce((total, r) => {
+
+    if (r.emisor.id === usuarioId) {
+      return total + r.horas; // suma
+    }
+
+    if (r.receptor.id === usuarioId) {
+      return total - r.horas; // resta
+    }
+
+    return total;
+
+  }, 0);
+}
+}

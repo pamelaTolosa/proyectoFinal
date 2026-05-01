@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { RegistroHoras } from '../../registro-horas/entities/registro-horas.entity';
 
 @Entity()
 export class Usuario {
@@ -26,8 +27,9 @@ export class Usuario {
 
   @Column()
   contrasenia!: string; 
+ @OneToMany(() => RegistroHoras, (registro) => registro.emisor)
+registrosEmitidos!: RegistroHoras[];
 
-  @Column()
-  cursos_brindados!: string;
-    
+@OneToMany(() => RegistroHoras, (registro) => registro.receptor)
+registrosRecibidos!: RegistroHoras[];
 }

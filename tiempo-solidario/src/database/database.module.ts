@@ -1,11 +1,8 @@
 // src/database/database.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
-// Aquí van tus entidades (ts files con @Entity)
-import { Usuario } from '../modules/usuario/entities/usuario.entity';
-
 import * as dotenv from 'dotenv';
+
 
 dotenv.config();
 @Module({
