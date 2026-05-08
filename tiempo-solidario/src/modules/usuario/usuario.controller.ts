@@ -1,26 +1,43 @@
-import { Controller, Get, Param, Put, Post, Delete, Body } from "@nestjs/common";
-import { UsuarioService } from "./usuario.service";
-import { CreateUsuarioDto } from "./dto/create-usuario.dto";
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 
-//acá declaramos los verbos http y los métodos que van a llamar a los servicios correspondientes, también se declaran las rutas para cada uno de ellos
-@Controller('/usuarios')
+import { UsuarioService } from './usuario.service';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
+
+@Controller('usuarios')
 export class UsuarioController {
 
- constructor(private readonly usuarioService: UsuarioService) {
+  constructor(
+    private readonly usuarioService: UsuarioService,
+  ) {}
 
-    this.usuarioService = usuarioService;
-  }
-
-  @Get()
-  getController() {
-    return this.usuarioService.getService();
-  }
+  // 🔥 CREAR USUARIO
   @Post()
-  postController(@Body() user: CreateUsuarioDto) {
+  postController(
+    @Body() user: CreateUsuarioDto,
+  ) {
     return this.usuarioService.postService(user);
   }
-@Get(':id/saldo')
-getSaldo(@Param('id') id: number) {
-  return this.usuarioService.getSaldo(id);
-}
+
+  // 🔥 OBTENER USUARIO POR ID
+  @Get(':id')
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.usuarioService.findOne(id);
+  }
+
+  // 🔥 SALDO
+  @Get(':id/saldo')
+  getSaldo(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.usuarioService.getSaldo(id);
+  }
 }

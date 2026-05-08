@@ -16,7 +16,8 @@ dotenv.config();
       database: process.env.DB_NAME!,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true, // solo en DEV
+      autoLoadEntities: true,
     }),
   ],
 })
-export class DatabaseModule {}
+export class DatabaseModule { }

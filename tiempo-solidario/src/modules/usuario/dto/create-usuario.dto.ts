@@ -14,11 +14,6 @@ import { Type } from 'class-transformer';
 
 export class CreateUsuarioDto {
 
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @IsNotEmpty()
-  dni: number;
 
   @IsString()
   @IsNotEmpty()
@@ -32,8 +27,6 @@ export class CreateUsuarioDto {
 
   @IsOptional()
   @IsString()
-  @IsUrl()
-  @MaxLength(255)
   foto?: string;
 
   @IsDateString()
