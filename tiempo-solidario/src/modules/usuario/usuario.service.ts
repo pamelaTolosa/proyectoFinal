@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import{ RegistroHoras } from '../registro-horas/entities/registro-horas.entity';
@@ -56,5 +56,21 @@ constructor(
     return total;
 
   }, 0);
+}
+async findOne(id: number) {
+
+  const usuario =
+    await this.usersRepository.findOne({
+      where: { id },
+      relations: ['cursos'],
+    });
+
+  if (!usuario) {
+    throw new NotFoundException(
+      'Usuario no encontrado',
+    );
+  }
+
+  return usuario;
 }
 }

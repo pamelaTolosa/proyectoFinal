@@ -1,5 +1,8 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { RegistroHoras } from '../../registro-horas/entities/registro-horas.entity';
+import { Course } from '../../cursos/entities/curso_entity';
+import { MaxLength } from 'class-validator/types/decorator/string/MaxLength';
+import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
 
 @Entity()
 export class Usuario {
@@ -10,26 +13,29 @@ export class Usuario {
   @Column()
   nombre!: string;
 
- @Column()
+  @Column()
   apellido!: string;
 
-  @Column()
-  foto!: string;
-
-  @Column()
-  fecha_de_nacimiento!: Date;
-
+  @Column({
+    type: 'longtext',
+    nullable: true,
+  })
+  @Column('longtext', { nullable: true })
+  foto?: string;
   @Column()
   correo!: string;
 
-  @Column()       
+  @Column()
   acerca_de_mi!: string;
 
   @Column()
-  contrasenia!: string; 
- @OneToMany(() => RegistroHoras, (registro) => registro.emisor)
-registrosEmitidos!: RegistroHoras[];
+  contrasenia!: string;
 
-@OneToMany(() => RegistroHoras, (registro) => registro.receptor)
-registrosRecibidos!: RegistroHoras[];
+  @OneToMany(() => RegistroHoras, (registro) => registro.emisor)
+  registrosEmitidos!: RegistroHoras[];
+
+  @OneToMany(() => RegistroHoras, (registro) => registro.receptor)
+  registrosRecibidos!: RegistroHoras[];
+  @OneToMany(() => Course, (course) => course.usuario)
+  cursos!: Course[];
 }
