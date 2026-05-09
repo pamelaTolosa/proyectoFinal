@@ -1,8 +1,13 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+
 import { RegistroHoras } from '../../registro-horas/entities/registro-horas.entity';
 import { Course } from '../../cursos/entities/curso_entity';
-import { MaxLength } from 'class-validator/types/decorator/string/MaxLength';
-import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
+import { Mensaje } from '../../mensajes/entities/mensaje.entity';
 
 @Entity()
 export class Usuario {
@@ -16,26 +21,63 @@ export class Usuario {
   @Column()
   apellido!: string;
 
-  @Column({
-    type: 'longtext',
-    nullable: true,
-  })
-  @Column('longtext', { nullable: true })
-  foto?: string;
+ @Column({
+  type: 'longtext',
+  nullable: true,
+})
+foto!: string;
+
+@Column({
+  type: 'text',
+  nullable: true,
+})
+acercaDeMi!: string;
+
   @Column()
   correo!: string;
 
   @Column()
-  acerca_de_mi!: string;
-
-  @Column()
   contrasenia!: string;
 
-  @OneToMany(() => RegistroHoras, (registro) => registro.emisor)
+  // =========================
+  // REGISTROS
+  // =========================
+
+  @OneToMany(
+    () => RegistroHoras,
+    (registro) => registro.emisor,
+  )
   registrosEmitidos!: RegistroHoras[];
 
-  @OneToMany(() => RegistroHoras, (registro) => registro.receptor)
+  @OneToMany(
+    () => RegistroHoras,
+    (registro) => registro.receptor,
+  )
   registrosRecibidos!: RegistroHoras[];
-  @OneToMany(() => Course, (course) => course.usuario)
+
+  // =========================
+  // CURSOS
+  // =========================
+
+  @OneToMany(
+    () => Course,
+    (course) => course.usuario,
+  )
   cursos!: Course[];
+
+  // =========================
+  // MENSAJES
+  // =========================
+
+  @OneToMany(
+    () => Mensaje,
+    (mensaje) => mensaje.emisor,
+  )
+  mensajesEnviados!: Mensaje[];
+
+  @OneToMany(
+    () => Mensaje,
+    (mensaje) => mensaje.receptor,
+  )
+  mensajesRecibidos!: Mensaje[];
 }
