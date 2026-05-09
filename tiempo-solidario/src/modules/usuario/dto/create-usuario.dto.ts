@@ -18,12 +18,12 @@ export class CreateUsuarioDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(45)
-  nombre: string;
+  nombre!: string;
 
   @IsString()
   @IsNotEmpty()
   @MaxLength(45)
-  apellido: string;
+  apellido!: string;
 
   @IsOptional()
   @IsString()
@@ -31,22 +31,23 @@ export class CreateUsuarioDto {
 
   @IsDateString()
   @IsNotEmpty()
-  fecha_de_nacimiento: string;
+  fecha_de_nacimiento!: string;
 
   @IsEmail()
   @IsNotEmpty()
   @MaxLength(100)
-  correo: string;
+  correo!: string;
 
   @IsString()
   @IsNotEmpty()
   @MaxLength(400)
-  acerca_de_mi: string;
+  acercaDeMi!: string;
+
 
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
   @MaxLength(255)
-  contrasenia: string;
+  contrasenia!: string;
 
 }

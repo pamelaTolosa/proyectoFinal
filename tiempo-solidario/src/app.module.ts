@@ -5,13 +5,15 @@ import { UsuarioModule } from './modules/usuario/usuario.module'; // Importa tu 
 import { RegistroHorasModule } from './modules/registro-horas/registro-horas.module'; // Importa tu módulo de registro de horas
 import { BilleteraModule } from './modules/billetera/billetera.module';
 import { CourseModule } from './modules/cursos/curso.module';
+import { MensajeModule } from './modules/mensajes/mensaje.module';
 @Module({
   imports: [
     DatabaseModule, 
     RegistroHorasModule,
     BilleteraModule,
     UsuarioModule,
-    CourseModule
+    CourseModule,
+    MensajeModule
   ],
 })
 export class AppModule {}

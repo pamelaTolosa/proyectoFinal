@@ -5,6 +5,7 @@ import {
   Post,
   Body,
   ParseIntPipe,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 import { UsuarioService } from './usuario.service';
@@ -17,6 +18,31 @@ export class UsuarioController {
     private readonly usuarioService: UsuarioService,
   ) {}
 
+  // 🔥 TODOS LOS USUARIOS
+  @Get()
+  findAll() {
+    return this.usuarioService.getService();
+  }
+
+  // 🔥 LOGIN
+  @Post('login')
+  async login(
+    @Body()
+    body: {
+      correo: string;
+      contrasenia: string;
+    },
+  ) {
+
+    const usuario =
+      await this.usuarioService.login(
+        body.correo,
+        body.contrasenia,
+      );
+
+    return usuario;
+  }
+
   // 🔥 CREAR USUARIO
   @Post()
   postController(
@@ -25,10 +51,11 @@ export class UsuarioController {
     return this.usuarioService.postService(user);
   }
 
-  // 🔥 OBTENER USUARIO POR ID
+  // 🔥 OBTENER POR ID
   @Get(':id')
   findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe)
+    id: number,
   ) {
     return this.usuarioService.findOne(id);
   }
@@ -36,7 +63,8 @@ export class UsuarioController {
   // 🔥 SALDO
   @Get(':id/saldo')
   getSaldo(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe)
+    id: number,
   ) {
     return this.usuarioService.getSaldo(id);
   }
