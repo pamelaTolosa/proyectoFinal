@@ -12,7 +12,7 @@ import { RegistroHoras } from '../registro-horas/entities/registro-horas.entity'
 
 import { Usuario } from './entities/usuario.entity';
 
-import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import {CreateUsuarioDto } from './dto/create-usuario.dto';
 
 @Injectable()
 export class UsuarioService {
@@ -30,7 +30,26 @@ export class UsuarioService {
   // =========================
   // OBTENER TODOS
   // =========================
+async findByDni(
+  dni: string,
+) {
 
+  const usuario =
+    await this.usersRepository.findOne({
+      where: {
+        dni,
+      },
+    });
+
+  if (!usuario) {
+
+    throw new NotFoundException(
+      'Usuario no encontrado',
+    );
+  }
+
+  return usuario;
+}
   async getService(): Promise<Usuario[]> {
 
     return this.usersRepository.find({
@@ -54,27 +73,82 @@ export class UsuarioService {
     userDto: CreateUsuarioDto,
   ) {
 
-    const existing =
+    // =========================
+    // VALIDAR CORREO
+    // =========================
+
+    const existingCorreo =
       await this.usersRepository.findOneBy({
         correo: userDto.correo,
       });
 
-    if (existing) {
+    if (existingCorreo) {
 
       throw new ConflictException(
         'El correo ya está registrado',
       );
     }
 
-    const user =
-      this.usersRepository.create(
-        userDto,
+    // =========================
+    // VALIDAR DNI
+    // =========================
+
+    const existingDni =
+      await this.usersRepository.findOneBy({
+        dni: userDto.dni,
+      });
+
+    if (existingDni) {
+
+      throw new ConflictException(
+        'El DNI ya está registrado',
       );
+    }
+
+    // =========================
+    // CREAR USUARIO
+    // =========================
+
+    const user =
+      this.usersRepository.create({
+
+        nombre: userDto.nombre,
+
+        apellido: userDto.apellido,
+
+        dni: userDto.dni,
+
+        correo: userDto.correo,
+
+        contrasenia:
+          userDto.contrasenia,
+
+        fecha_de_nacimiento:
+          userDto.fecha_de_nacimiento,
+
+        acercaDeMi:
+          userDto.acercaDeMi,
+
+        foto: userDto.foto,
+
+      });
 
     return this.usersRepository.save(
       user,
     );
   }
+  async create(createUsuarioDto: CreateUsuarioDto) {
+
+  console.log("DTO:");
+  console.log(createUsuarioDto);
+
+  const usuario = this.usersRepository.create(createUsuarioDto);
+
+  console.log("USUARIO:");
+  console.log(usuario);
+
+  return this.usersRepository.save(usuario);
+}
 
   // =========================
   // SALDO
@@ -185,4 +259,5 @@ export class UsuarioService {
 
     return usuario;
   }
+  
 }

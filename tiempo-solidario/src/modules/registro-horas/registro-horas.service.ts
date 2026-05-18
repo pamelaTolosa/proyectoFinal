@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { RegistroHoras } from './entities/registro-horas.entity';
 import { BilleteraDeHoras } from '../billetera/entities/billetera.entity';
 import { CreateRegistroHorasDto } from './dto/create-registro-horas.dto';
+import { NotificacionService } from '../notificaciones/notificacion.service';
 
 @Injectable()
 export class RegistroHorasService {
@@ -12,37 +13,69 @@ export class RegistroHorasService {
   private readonly LIMITE_NEGATIVO_RECEPTOR = -3;
 
   constructor(
+
     @InjectRepository(RegistroHoras)
     private registroRepository: Repository<RegistroHoras>,
 
     @InjectRepository(BilleteraDeHoras)
     private billeteraRepository: Repository<BilleteraDeHoras>,
-  ) {}
-private async asegurarBilletera(usuarioId: number) {
-    let wallet = await this.billeteraRepository.findOne({
-      where: { usuario: { id: usuarioId } },
-    });
 
-    if (!wallet) {
-      wallet = this.billeteraRepository.create({
-        usuario: { id: usuarioId },
-        saldo: 0,
+    private notificacionService: NotificacionService,
+
+  ) {}
+
+  // =========================
+  // ASEGURAR BILLETERA
+  // =========================
+
+  private async asegurarBilletera(usuarioId: number) {
+
+    let wallet =
+      await this.billeteraRepository.findOne({
+        where: {
+          usuario: { id: usuarioId },
+        },
       });
 
-      await this.billeteraRepository.save(wallet);
+    if (!wallet) {
+
+      wallet =
+        this.billeteraRepository.create({
+
+          usuario: {
+            id: usuarioId,
+          },
+
+          saldo: 0,
+        });
+
+      await this.billeteraRepository.save(
+        wallet
+      );
     }
   }
 
-  // 🔥 SALDO REAL
-  private async getSaldo(usuarioId: number): Promise<number> {
+  // =========================
+  // SALDO REAL
+  // =========================
 
-    const registros = await this.registroRepository.find({
-      relations: ['emisor', 'receptor'],
-      where: [
-        { emisor: { id: usuarioId } },
-        { receptor: { id: usuarioId } },
-      ],
-    });
+  private async getSaldo(
+    usuarioId: number,
+  ): Promise<number> {
+
+    const registros =
+      await this.registroRepository.find({
+
+        relations: [
+          'emisor',
+          'receptor',
+        ],
+
+        where: [
+          { emisor: { id: usuarioId } },
+          { receptor: { id: usuarioId } },
+        ],
+      });
 
     return registros.reduce((total, r) => {
 
@@ -59,60 +92,174 @@ private async asegurarBilletera(usuarioId: number) {
     }, 0);
   }
 
-  // 🧠 CREAR REGISTRO
- async createRegistro(dto: CreateRegistroHorasDto) {
+  // =========================
+  // CREAR REGISTRO
+  // =========================
 
-  if (dto.emisor_id === dto.receptor_id) {
-    throw new BadRequestException(
-      'El emisor y receptor no pueden ser el mismo usuario'
+  async createRegistro(
+    dto: CreateRegistroHorasDto,
+  ) {
+
+    if (
+      dto.emisor_id === dto.receptor_id
+    ) {
+
+      throw new BadRequestException(
+        'El emisor y receptor no pueden ser el mismo usuario'
+      );
+    }
+
+    // 🔥 asegurar billeteras
+
+    await this.asegurarBilletera(
+      dto.emisor_id
     );
-  }
 
-  // 🔥 asegurar billeteras
-  await this.asegurarBilletera(dto.emisor_id);
-  await this.asegurarBilletera(dto.receptor_id);
-
-  // 🔥 traer billetera REAL del receptor
-  const walletReceptor = await this.billeteraRepository.findOne({
-    where: { usuario: { id: dto.receptor_id } },
-  });
-
-  if (!walletReceptor) {
-    throw new BadRequestException('Billetera no encontrada');
-  }
-
-  const saldoFinal = walletReceptor.saldo - dto.horas;
-
-  // 🚨 VALIDACIÓN REAL
-  if (saldoFinal < this.LIMITE_NEGATIVO_RECEPTOR) {
-    throw new BadRequestException(
-      `El receptor no puede superar deuda de ${this.LIMITE_NEGATIVO_RECEPTOR} horas`
+    await this.asegurarBilletera(
+      dto.receptor_id
     );
-  }
 
-  // 🔥 crear registro
-  const registro = this.registroRepository.create({
-    fecha: dto.fecha,
-    horas: dto.horas,
-    emisor: { id: dto.emisor_id },
-    receptor: { id: dto.receptor_id },
+    // 🔥 billetera receptor
+
+    const walletReceptor =
+      await this.billeteraRepository.findOne({
+
+        where: {
+          usuario: {
+            id: dto.receptor_id,
+          },
+        },
+      });
+
+    if (!walletReceptor) {
+
+      throw new BadRequestException(
+        'Billetera no encontrada'
+      );
+    }
+
+    const saldoFinal =
+      walletReceptor.saldo - dto.horas;
+
+    if (
+      saldoFinal <
+      this.LIMITE_NEGATIVO_RECEPTOR
+    ) {
+
+      throw new BadRequestException(
+        `El receptor no puede superar deuda de ${this.LIMITE_NEGATIVO_RECEPTOR} horas`
+      );
+    }
+
+    // =========================
+    // CREAR REGISTRO
+    // =========================
+
+    const registro =
+      this.registroRepository.create({
+
+        fecha: dto.fecha,
+
+        horas: dto.horas,
+
+        emisor: {
+          id: dto.emisor_id,
+        },
+
+        receptor: {
+          id: dto.receptor_id,
+        },
+      });
+
+    await this.registroRepository.save(
+      registro
+    );
+
+    // =========================
+    // ACTUALIZAR BILLETERA
+    // =========================
+
+    await this.billeteraRepository.increment(
+      {
+        usuario: {
+          id: dto.emisor_id,
+        },
+      },
+      'saldo',
+      dto.horas,
+    );
+
+    await this.billeteraRepository.increment(
+      {
+        usuario: {
+          id: dto.receptor_id,
+        },
+      },
+      'saldo',
+      -dto.horas,
+    );
+
+    // =========================
+    // 🔥 NOTIFICACIÓN
+    // =========================
+
+  await this.notificacionService.create({
+
+  mensaje:
+    `Te registraron ${dto.horas} horas`,
+
+  fecha: dto.fecha,
+
+  idRegistro: registro.id,
+
+  usuario: {
+    id: dto.receptor_id,
+  } as any,
+
+  emisor: {
+    id: dto.emisor_id,
+  } as any,
+
+});
+
+// =========================
+// RETURN
+// =========================
+
+return registro;
+}
+// =========================
+// TODOS
+// =========================
+
+// =========================
+// TODOS
+// =========================
+
+findAll() {
+
+  return this.registroRepository.find({
+    relations: ['emisor', 'receptor'],
   });
+}
 
-  await this.registroRepository.save(registro);
+// =========================
+// POR USUARIO
+// =========================
 
-  // 🔥 actualizar billetera
-  await this.billeteraRepository.increment(
-    { usuario: { id: dto.emisor_id } },
-    'saldo',
-    dto.horas,
-  );
+findByUsuario(id: number) {
 
-  await this.billeteraRepository.increment(
-    { usuario: { id: dto.receptor_id } },
-    'saldo',
-    -dto.horas,
-  );
+  return this.registroRepository.find({
 
-  return registro;
+    where: [
+      { emisor: { id } },
+      { receptor: { id } },
+    ],
+
+    relations: [
+      'emisor',
+      'receptor',
+    ],
+  });
 }
 }

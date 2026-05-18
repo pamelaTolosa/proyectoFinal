@@ -14,7 +14,9 @@ export class Mensaje {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column('text')
+  @Column({
+    type: 'text',
+  })
   mensaje!: string;
 
   @CreateDateColumn()
@@ -31,4 +33,5 @@ export class Mensaje {
     (usuario) => usuario.mensajesRecibidos,
   )
   receptor!: Usuario;
+
 }

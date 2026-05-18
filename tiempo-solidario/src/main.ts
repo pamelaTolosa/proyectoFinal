@@ -16,12 +16,12 @@ async function bootstrap() {
     extended: true,
   }));
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }),
-  );
+ app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,
+    transform: true,
+  }),
+);
 
   // 🔥 CORS
   app.enableCors({
