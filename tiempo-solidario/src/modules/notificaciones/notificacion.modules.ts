@@ -1,3 +1,4 @@
+import { BilleteraDeHoras } from './../billetera/entities/billetera.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificacionService } from './notificacion.service';
@@ -13,6 +14,7 @@ import { RegistroHoras } from '../registro-horas/entities/registro-horas.entity'
             Notificacion,
             RegistroHoras,
             Usuario,
+            BilleteraDeHoras,
         ]),
     ],
 
