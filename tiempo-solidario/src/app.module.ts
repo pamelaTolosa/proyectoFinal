@@ -6,6 +6,7 @@ import { RegistroHorasModule } from './modules/registro-horas/registro-horas.mod
 import { BilleteraModule } from './modules/billetera/billetera.module';
 import { CourseModule } from './modules/cursos/curso.module';
 import { MensajeModule } from './modules/mensajes/mensaje.module';
+import { NotificacionModule } from './modules/notificaciones/notificacion.modules';
 @Module({
   imports: [
     DatabaseModule, 
@@ -13,7 +14,8 @@ import { MensajeModule } from './modules/mensajes/mensaje.module';
     BilleteraModule,
     UsuarioModule,
     CourseModule,
-    MensajeModule
+    MensajeModule,
+    NotificacionModule,
   ],
 })
 export class AppModule {}

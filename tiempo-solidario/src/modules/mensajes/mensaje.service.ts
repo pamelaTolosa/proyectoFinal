@@ -1,5 +1,6 @@
 import {
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -90,4 +91,24 @@ const mensaje =
       },
     });
   }
+  async findByDni(
+  dni: string,
+) {
+
+  const usuario =
+    await this.usuarioRepository.findOne({
+      where: {
+        dni,
+      },
+    });
+
+  if (!usuario) {
+
+    throw new NotFoundException(
+      'Usuario no encontrado',
+    );
+  }
+
+  return usuario;
+}
 }

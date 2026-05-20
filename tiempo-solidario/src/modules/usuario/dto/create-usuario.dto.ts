@@ -1,53 +1,29 @@
-import {
-  IsString,
-  IsEmail,
-  IsDateString,
-  IsNotEmpty,
-  MinLength,
-  MaxLength,
-  IsInt,
-  Min,
-  IsOptional,
-  IsUrl,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString } from 'class-validator';
 
 export class CreateUsuarioDto {
 
-
   @IsString()
-  @IsNotEmpty()
-  @MaxLength(45)
   nombre!: string;
 
   @IsString()
-  @IsNotEmpty()
-  @MaxLength(45)
   apellido!: string;
 
-  @IsOptional()
   @IsString()
-  foto?: string;
+  dni!: string;
 
-  @IsDateString()
-  @IsNotEmpty()
-  fecha_de_nacimiento!: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  @MaxLength(100)
+  @IsString()
   correo!: string;
 
   @IsString()
-  @IsNotEmpty()
-  @MaxLength(400)
-  acercaDeMi!: string;
-
+  contrasenia!: string;
 
   @IsString()
-  @IsNotEmpty()
-  @MinLength(6)
-  @MaxLength(255)
-  contrasenia!: string;
+  fecha_de_nacimiento!: string;
+
+  @IsString()
+  acercaDeMi!: string;
+
+  @IsString()
+  foto!: string;
 
 }

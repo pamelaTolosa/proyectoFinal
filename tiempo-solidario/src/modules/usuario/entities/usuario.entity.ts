@@ -1,8 +1,8 @@
 import {
-  Column,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
 } from 'typeorm';
 
 import { RegistroHoras } from '../../registro-horas/entities/registro-horas.entity';
@@ -21,23 +21,43 @@ export class Usuario {
   @Column()
   apellido!: string;
 
- @Column({
-  type: 'longtext',
-  nullable: true,
-})
-foto!: string;
+  @Column({
+    unique: true,
+  })
+  dni!: string;
 
-@Column({
-  type: 'text',
-  nullable: true,
-})
-acercaDeMi!: string;
+  @Column({
+    type: 'longtext',
+    nullable: true,
+  })
+  foto!: string;
 
   @Column()
+  fecha_de_nacimiento!: string;
+
+  @Column({
+    unique: true,
+  })
   correo!: string;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  acercaDeMi!: string;
 
   @Column()
   contrasenia!: string;
+
+  // =========================
+  // CURSOS
+  // =========================
+
+  @OneToMany(
+    () => Course,
+    (course) => course.usuario,
+  )
+  cursos!: Course[];
 
   // =========================
   // REGISTROS
@@ -56,16 +76,6 @@ acercaDeMi!: string;
   registrosRecibidos!: RegistroHoras[];
 
   // =========================
-  // CURSOS
-  // =========================
-
-  @OneToMany(
-    () => Course,
-    (course) => course.usuario,
-  )
-  cursos!: Course[];
-
-  // =========================
   // MENSAJES
   // =========================
 
@@ -80,4 +90,5 @@ acercaDeMi!: string;
     (mensaje) => mensaje.receptor,
   )
   mensajesRecibidos!: Mensaje[];
+
 }
