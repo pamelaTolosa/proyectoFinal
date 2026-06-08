@@ -12,15 +12,15 @@ import { Usuario } from '../../usuario/entities/usuario.entity';
 export class RegistroHoras {
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   // 📅 Fecha del intercambio
   @Column({ type: 'date' })
-  fecha: Date;
+  fecha!: Date;
 
   // ⏱ Cantidad de horas (SIEMPRE POSITIVO)
   @Column({ type: 'int' })
-  horas: number;
+  horas!: number;
 
   // 👤 Usuario que brinda el servicio (GANA horas)
   @ManyToOne(() => Usuario, (usuario) => usuario.registrosEmitidos, {

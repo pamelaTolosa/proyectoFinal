@@ -12,7 +12,7 @@ import { RegistroHoras } from '../registro-horas/entities/registro-horas.entity'
 
 import { Usuario } from './entities/usuario.entity';
 
-import {CreateUsuarioDto } from './dto/create-usuario.dto';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
 
 @Injectable()
 export class UsuarioService {
@@ -28,41 +28,47 @@ export class UsuarioService {
   ) {}
 
   // =========================
-  // OBTENER TODOS
+  // BUSCAR POR DNI
   // =========================
-async findByDni(
-  dni: string,
-) {
 
-  const usuario =
-    await this.usersRepository.findOne({
-      where: {
-        dni,
-      },
-    });
+  async findByDni(dni: string) {
 
-  if (!usuario) {
+    const usuario =
+      await this.usersRepository.findOne({
+        where: {
+          dni,
+        },
+      });
 
-    throw new NotFoundException(
-      'Usuario no encontrado',
-    );
+    if (!usuario) {
+
+      throw new NotFoundException(
+        'Usuario no encontrado',
+      );
+    }
+
+    return usuario;
   }
 
-  return usuario;
-}
+  // =========================
+  // OBTENER TODOS
+  // =========================
+
   async getService(): Promise<Usuario[]> {
 
     return this.usersRepository.find({
 
-      relations: [
-        'cursos',
-        'registrosEmitidos',
-        'registrosRecibidos',
-        'mensajesEnviados',
-        'mensajesRecibidos',
-      ],
+      relations: {
+        'cursos': true,
+        'registrosEmitidos': true,
+        'registrosRecibidos': true,
+        'mensajesEnviados' : true,
+        'mensajesRecibidos' : true,
+      
+      },
 
     });
+  
   }
 
   // =========================
@@ -78,8 +84,10 @@ async findByDni(
     // =========================
 
     const existingCorreo =
-      await this.usersRepository.findOneBy({
-        correo: userDto.correo,
+      await this.usersRepository.findOne({
+        where: {
+          correo: userDto.correo,
+        },
       });
 
     if (existingCorreo) {
@@ -94,8 +102,10 @@ async findByDni(
     // =========================
 
     const existingDni =
-      await this.usersRepository.findOneBy({
-        dni: userDto.dni,
+      await this.usersRepository.findOne({
+        where: {
+          dni: userDto.dni,
+        },
       });
 
     if (existingDni) {
@@ -137,18 +147,30 @@ async findByDni(
       user,
     );
   }
-  async create(createUsuarioDto: CreateUsuarioDto) {
 
-  console.log("DTO:");
-  console.log(createUsuarioDto);
+  // =========================
+  // CREATE SIMPLE
+  // =========================
 
-  const usuario = this.usersRepository.create(createUsuarioDto);
+  async create(
+    createUsuarioDto: CreateUsuarioDto,
+  ) {
 
-  console.log("USUARIO:");
-  console.log(usuario);
+    console.log('DTO:');
+    console.log(createUsuarioDto);
 
-  return this.usersRepository.save(usuario);
-}
+    const usuario =
+      this.usersRepository.create(
+        createUsuarioDto,
+      );
+
+    console.log('USUARIO:');
+    console.log(usuario);
+
+    return this.usersRepository.save(
+      usuario,
+    );
+  }
 
   // =========================
   // SALDO
@@ -161,10 +183,10 @@ async findByDni(
     const registros =
       await this.registroRepository.find({
 
-        relations: [
-          'emisor',
-          'receptor',
-        ],
+        relations: {
+          'emisor': true,
+          'receptor': true,
+        },
 
       });
 
@@ -205,13 +227,13 @@ async findByDni(
           id,
         },
 
-        relations: [
-          'cursos',
-          'registrosEmitidos',
-          'registrosRecibidos',
-          'mensajesEnviados',
-          'mensajesRecibidos',
-        ],
+        relations: {
+          'cursos': true,
+          'registrosEmitidos': true,
+          'registrosRecibidos': true,
+          'mensajesEnviados': true,
+          'mensajesRecibidos': true,
+        },
 
       });
 
@@ -242,11 +264,11 @@ async findByDni(
           contrasenia,
         },
 
-        relations: [
-          'cursos',
-          'mensajesEnviados',
-          'mensajesRecibidos',
-        ],
+        relations: {
+          'cursos': true,
+          'mensajesEnviados': true,
+          'mensajesRecibidos': true,
+        },
 
       });
 
@@ -259,5 +281,11 @@ async findByDni(
 
     return usuario;
   }
-  
+async findByUsername(username: string): Promise<Usuario | null> {
+  return this.usersRepository.findOne({
+    where: {
+      nombre: username,
+    },
+  });
+}
 }

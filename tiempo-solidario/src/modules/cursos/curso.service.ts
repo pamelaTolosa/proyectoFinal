@@ -24,17 +24,23 @@ export class CourseService {
   ) {}
 
   findAll() {
-    return this.courseRepo.find({
-      relations: ['usuario', 'usuario.cursos'],
-    });
-  }
+  return this.courseRepo.find({
+    relations: {
+      usuario: {
+        cursos: true,
+      },
+    },
+  });
+}
 
-  findOne(id: number) {
-    return this.courseRepo.findOne({
-      where: { id },
-      relations: ['usuario'],
-    });
-  }
+findOne(id: number) {
+  return this.courseRepo.findOne({
+    where: { id },
+    relations: {
+      usuario: true,
+    },
+  });
+}
 
   async create(userId: number, data: CreateCourseDto) {
     const usuario = await this.usuarioRepo.findOne({

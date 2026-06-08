@@ -60,7 +60,7 @@ export class BilleteraService {
   findAll() {
 
     return this.billeteraRepository.find({
-      relations: ['usuario'],
+      relations: {'usuario': true},
     });
   }
 
@@ -79,7 +79,7 @@ export class BilleteraService {
         },
       },
 
-      relations: ['usuario'],
+      relations: {'usuario': true},
     });
   }
 }

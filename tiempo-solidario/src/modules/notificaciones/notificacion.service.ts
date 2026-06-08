@@ -57,10 +57,10 @@ findByUsuario(userId: number) {
       leida: false,
     },
 
-    relations: [
-      'usuario',
-      'emisor',
-    ],
+    relations: {
+      usuario: true,
+      emisor: true,
+    },
 
     order: {
       id: 'DESC',
@@ -79,10 +79,10 @@ findByUsuario(userId: number) {
 
         where: { id },
 
-        relations: [
-          'usuario',
-          'emisor',
-        ],
+        relations: {
+          usuario: true,
+          emisor: true,
+        },
       });
 
     if (!noti) {
