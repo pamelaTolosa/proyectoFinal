@@ -25,7 +25,7 @@ export class UsuarioService {
     @InjectRepository(RegistroHoras)
     private registroRepository: Repository<RegistroHoras>,
 
-  ) {}
+  ) { }
 
   // =========================
   // BUSCAR POR DNI
@@ -62,13 +62,13 @@ export class UsuarioService {
         'cursos': true,
         'registrosEmitidos': true,
         'registrosRecibidos': true,
-        'mensajesEnviados' : true,
-        'mensajesRecibidos' : true,
-      
+        'mensajesEnviados': true,
+        'mensajesRecibidos': true,
+
       },
 
     });
-  
+
   }
 
   // =========================
@@ -255,6 +255,8 @@ export class UsuarioService {
     correo: string,
     contrasenia: string,
   ) {
+console.log('CORREO:', correo);
+  console.log('CONTRASENIA:', contrasenia);
 
     const usuario =
       await this.usersRepository.findOne({
@@ -281,11 +283,13 @@ export class UsuarioService {
 
     return usuario;
   }
-async findByUsername(username: string): Promise<Usuario | null> {
-  return this.usersRepository.findOne({
-    where: {
-      nombre: username,
-    },
-  });
-}
+  async findByCorreo(correo: string): Promise<Usuario | null> {
+    return this.usersRepository.findOne({
+      where: {
+        correo,
+      },
+    });
+  }
+  
+
 }
