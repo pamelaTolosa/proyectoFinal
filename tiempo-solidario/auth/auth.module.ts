@@ -16,7 +16,7 @@ import { Public } from './metadata';
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60s' }, // TODO: Cambiar a un valor deseado 15m, 1h, etc.
+      signOptions: { expiresIn: '8h' }, // TODO: Cambiar a un valor deseado 15m, 1h, etc.
     }),
   ],
   controllers: [AuthController],
