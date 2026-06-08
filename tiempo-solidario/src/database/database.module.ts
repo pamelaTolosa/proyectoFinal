@@ -2,6 +2,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
+import { Usuario } from '../modules/usuario/entities/usuario.entity';
+import { UsuarioModule } from '../modules/usuario/usuario.module';
+import { AuthModule } from '../../auth/auth.module';
 
 
 dotenv.config();
@@ -21,6 +24,9 @@ console.log(process.env.DB_USER);
       synchronize: false,
       autoLoadEntities: true,
     }),
+    TypeOrmModule.forFeature([Usuario]),
+    UsuarioModule,
+    AuthModule,
   ],
 })
 export class DatabaseModule {}

@@ -66,10 +66,10 @@ export class RegistroHorasService {
     const registros =
       await this.registroRepository.find({
 
-        relations: [
-          'emisor',
-          'receptor',
-        ],
+        relations: {
+          emisor: true,
+          receptor: true,
+        },
 
         where: [
           { emisor: { id: usuarioId } },
@@ -239,7 +239,10 @@ return registro;
 findAll() {
 
   return this.registroRepository.find({
-    relations: ['emisor', 'receptor'],
+    relations: {
+      emisor: true,
+      receptor: true,
+    },
   });
 }
 
@@ -256,10 +259,10 @@ findByUsuario(id: number) {
       { receptor: { id } },
     ],
 
-    relations: [
-      'emisor',
-      'receptor',
-    ],
+    relations: {
+      emisor: true,
+      receptor: true,
+    },
   });
 }
 }

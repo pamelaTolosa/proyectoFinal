@@ -47,7 +47,7 @@ if (!emisor || !receptor) {
   );
 }
 
-   const nuevoMensaje: Partial<Mensaje> = {
+  const nuevoMensaje: Partial<Mensaje> = {
   mensaje: body.mensaje,
   emisor,
   receptor,
@@ -82,10 +82,10 @@ const mensaje =
           },
         },
       ],
-      relations: [
-        'emisor',
-        'receptor',
-      ],
+      relations: {
+        emisor: true,
+        receptor: true,
+      },
       order: {
         fecha: 'DESC',
       },
