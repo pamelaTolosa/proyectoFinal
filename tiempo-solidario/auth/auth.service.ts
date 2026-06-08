@@ -10,21 +10,32 @@ export class AuthService {
   ) {}
 
   async signIn(
-    username: string,
-    pass: string,
-  ): Promise<{ access_token: string }> {
-    const user = await this.usuarioService.findByUsername(username);
-    if (!user || user.contrasenia !== pass) {
-      throw new UnauthorizedException();
-    }
+  correo: string,
+  contrasenia: string,
+) {
+  const user =
+    await this.usuarioService.findByCorreo(correo);
 
-    const payload = {
-      sub: user.id,
-      username: user.nombre,
-    };
-
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+  if (!user || user.contrasenia !== contrasenia) {
+    throw new UnauthorizedException();
   }
+
+  const payload = {
+    sub: user.id,
+    username: user.nombre,
+  };
+
+  const access_token =
+    await this.jwtService.signAsync(payload);
+
+  return {
+    access_token,
+    usuario: {
+      id: user.id,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      correo: user.correo,
+    },
+  };
+}
 }

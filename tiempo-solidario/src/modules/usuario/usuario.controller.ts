@@ -10,6 +10,7 @@ import {
 import { UsuarioService } from './usuario.service';
 
 import {CreateUsuarioDto} from './dto/create-usuario.dto';
+import { Public } from '../../../auth/metadata';
 
 @Controller('usuarios')
 export class UsuarioController {
@@ -43,6 +44,8 @@ export class UsuarioController {
     },
 
   ) {
+ console.log('ENTRO A /usuarios/login');
+  console.log(body);
 
     return this.usuarioService.login(
       body.correo,
@@ -87,9 +90,10 @@ export class UsuarioController {
     return this.usuarioService.getSaldo(id);
 
   }
+  @Public()
   @Post()
 create(@Body() createUsuarioDto: CreateUsuarioDto) {
-  return this.usuarioService.create(createUsuarioDto);
+  return this.usuarioService.postService(createUsuarioDto);
 }
 @Get('dni/:dni')
 findByDni(

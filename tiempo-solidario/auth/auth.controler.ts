@@ -10,15 +10,20 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { Public } from './metadata';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
   signIn(@Body() signInDto: Record<string, any>) {
-    return this.authService.signIn(signInDto.username, signInDto.password);
+    return this.authService.signIn(
+      signInDto.correo,
+      signInDto.contrasenia,
+    );
   }
 
   @UseGuards(AuthGuard)
@@ -26,5 +31,6 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
+
 }
 

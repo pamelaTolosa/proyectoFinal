@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { jwtConstants } from './constans';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard'; 
+import { Public } from './metadata';
 
 
 
