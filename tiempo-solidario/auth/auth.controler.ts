@@ -11,10 +11,14 @@ import {
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { Public } from './metadata';
+import { UsuarioService } from '../src/modules/usuario/usuario.service';  
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usuarioService: UsuarioService
+  ) { }
 
   @Public()
   @HttpCode(HttpStatus.OK)
@@ -26,11 +30,11 @@ export class AuthController {
     );
   }
 
-  @UseGuards(AuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
-  }
+ @UseGuards(AuthGuard)
+@Get('profile')
+async getProfile(@Request() req) {
+  return this.usuarioService.findOne(req.user.sub);
+}
 
 }
 
