@@ -23,41 +23,45 @@ export class CourseService {
     private readonly usuarioRepo: Repository<Usuario>,
   ) {}
 
+  // =========================
+  // TODOS LOS CURSOS
+  // =========================
   findAll() {
-  return this.courseRepo.find({
-    relations: {
-      usuario: {
-        cursos: true,
+    return this.courseRepo.find({
+      relations: {
+        usuario: true,
       },
-    },
-  });
-}
+    });
+  }
 
-findOne(id: number) {
-  return this.courseRepo.findOne({
-    where: { id },
-    relations: {
-      usuario: true,
-    },
-  });
-}
+  // =========================
+  // UN CURSO
+  // =========================
+  findOne(id: number) {
+    return this.courseRepo.findOne({
+      where: { id },
+      relations: {
+        usuario: true,
+      },
+    });
+  }
 
+  // =========================
+  // CREAR UNO
+  // =========================
   async create(userId: number, data: CreateCourseDto) {
     const usuario = await this.usuarioRepo.findOne({
       where: { id: userId },
+      relations: {
+        cursos: true,
+      },
     });
 
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    const cantidadCursos = await this.courseRepo.count({
-      where: {
-        usuario: { id: userId },
-      },
-    });
-
-    if (cantidadCursos >= 10) {
+    if (usuario.cursos.length >= 10) {
       throw new BadRequestException('Máximo 10 cursos permitidos');
     }
 
@@ -66,27 +70,28 @@ findOne(id: number) {
       usuario,
     });
 
-    return await this.courseRepo.save(course);
+    return this.courseRepo.save(course);
   }
 
+  // =========================
+  // CREAR MUCHOS
+  // =========================
   async createMany(userId: number, cursosDto: CreateCourseDto[]) {
     const usuario = await this.usuarioRepo.findOne({
       where: { id: userId },
+      relations: {
+        cursos: true,
+      },
     });
 
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    const cantidadCursos = await this.courseRepo.count({
-      where: {
-        usuario: { id: userId },
-      },
-    });
+    const totalCursos =
+      usuario.cursos.length + cursosDto.length;
 
-    const total = cantidadCursos + cursosDto.length;
-
-    if (total > 10) {
+    if (totalCursos > 10) {
       throw new BadRequestException('Máximo 10 cursos permitidos');
     }
 
@@ -97,9 +102,12 @@ findOne(id: number) {
       }),
     );
 
-    return await this.courseRepo.save(cursos);
+    return this.courseRepo.save(cursos);
   }
 
+  // =========================
+  // UPDATE
+  // =========================
   async update(id: number, data: UpdateCourseDto) {
     const course = await this.courseRepo.findOne({
       where: { id },
@@ -115,8 +123,16 @@ findOne(id: number) {
     return this.courseRepo.save(course);
   }
 
+  // =========================
+  // DELETE
+  // =========================
   async remove(id: number) {
-    const course = await this.findOne(id);
+    const course = await this.courseRepo.findOne({
+      where: { id },
+      relations: {
+        usuario: true,
+      },
+    });
 
     if (!course) {
       throw new NotFoundException('Curso no encontrado');

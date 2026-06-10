@@ -11,4 +11,5 @@ export class Course {
 
   @ManyToOne(() => Usuario, (usuario) => usuario.cursos)
   usuario!: Usuario;
+  
 }

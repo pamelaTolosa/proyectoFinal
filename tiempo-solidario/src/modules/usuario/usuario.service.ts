@@ -290,6 +290,14 @@ console.log('CORREO:', correo);
       },
     });
   }
-  
+ 
+async findById(id: number) {
+  return this.usersRepository.findOne({
+    where: { id },
+    relations: {
+      cursos: true,
+    },
+  });
+}
 
 }

@@ -38,4 +38,7 @@ export class AuthService {
     },
   };
 }
+async getProfile(userId: number) {
+  return this.usuarioService.findById(userId);
+}
 }
