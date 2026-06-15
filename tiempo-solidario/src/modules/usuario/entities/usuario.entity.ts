@@ -8,6 +8,7 @@ import {
 import { RegistroHoras } from '../../registro-horas/entities/registro-horas.entity';
 import { Course } from '../../cursos/entities/curso_entity';
 import { Mensaje } from '../../mensajes/entities/mensaje.entity';
+import { Valoracion } from '../../valoraciones/entities/valoraciones.entity';
 
 @Entity()
 export class Usuario {
@@ -91,5 +92,15 @@ export class Usuario {
   )
   mensajesRecibidos!: Mensaje[];
 
-  
+  @OneToMany(
+  () => Valoracion,
+  (valoracion) => valoracion.usuarioQueValora,
+)
+valoracionesHechas!: Valoracion[];
+
+@OneToMany(
+  () => Valoracion,
+  (valoracion) => valoracion.usuarioValorado,
+)
+valoracionesRecibidas!: Valoracion[];
 }
