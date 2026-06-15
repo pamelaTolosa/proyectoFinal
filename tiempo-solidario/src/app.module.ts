@@ -8,6 +8,7 @@ import { CourseModule } from './modules/cursos/curso.module';
 import { MensajeModule } from './modules/mensajes/mensaje.module';
 import { NotificacionModule } from './modules/notificaciones/notificacion.modules';
 import { AuthModule } from '../auth/auth.module';
+import { ValoracionModule } from './modules/valoraciones/valoraciones.module';
 @Module({
   imports: [
     DatabaseModule, 
@@ -17,7 +18,8 @@ import { AuthModule } from '../auth/auth.module';
     CourseModule,
     MensajeModule,
     NotificacionModule,
-    AuthModule
+    AuthModule,
+    ValoracionModule,
   ],
 })
 export class AppModule {}
