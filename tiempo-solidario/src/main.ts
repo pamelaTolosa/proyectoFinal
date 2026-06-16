@@ -25,11 +25,14 @@ async function bootstrap() {
 
   // 🔥 CORS
   app.enableCors({
-    origin: 'http://localhost:5173',
-    credentials: true,
-  });
+  origin: [
+    "https://proyectofinal-1-qzvx.onrender.com",
+    "http://localhost:5173",
+  ],
+  credentials: true,
+});
 
-  await app.listen(process.env.PORT ?? 3000);
+await app.listen(process.env.PORT || 3000);
 }
 
 bootstrap();
