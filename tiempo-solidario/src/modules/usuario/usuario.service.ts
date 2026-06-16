@@ -73,27 +73,6 @@ export class UsuarioService {
   }
 
   // =========================
-  // LOGIN (LIMPIO)
-  // =========================
-  async login(correo: string, contrasenia: string) {
-    const usuario = await this.usersRepository.findOne({
-      where: { correo, contrasenia },
-      select: {
-        id: true,
-        nombre: true,
-        apellido: true,
-        correo: true,
-      },
-    });
-
-    if (!usuario) {
-      throw new NotFoundException('Correo o contraseña incorrectos');
-    }
-
-    return usuario;
-  }
-
-  // =========================
   // FIND ONE
   // =========================
  async findOne(id: number) {
@@ -136,11 +115,6 @@ export class UsuarioService {
       return total;
     }, 0);
   }
-  async findByCorreo(correo: string) {
-  return this.usersRepository.findOne({
-    where: { correo },
-  });
-}
 async findById(id: number) {
   return this.usersRepository.findOne({
     where: { id },

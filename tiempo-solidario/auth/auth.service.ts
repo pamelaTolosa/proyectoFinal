@@ -10,31 +10,27 @@ export class AuthService {
     private jwtService: JwtService,
   ) { }
 
-  async signIn(correo: string, contrasenia: string) {
-    const usuario = await this.usuarioService.findByEmail(correo);
+ async signIn(correo: string, contrasenia: string) {
+  const usuario = await this.usuarioService.findByEmail(correo);
 
-    if (!usuario) {
-      throw new UnauthorizedException('Usuario no encontrado');
-    }
-
-    const ok = await bcrypt.compare(contrasenia, usuario.contrasenia);
-
-    if (!ok) {
-      throw new UnauthorizedException('Contraseña incorrecta');
-    }
-
-    const token = this.jwtService.sign({
-      sub: usuario.id,
-      correo: usuario.correo,
-    });
-
-    return {
-      access_token: token,
-      usuario,
-    };
+  if (!usuario) {
+    throw new UnauthorizedException('Usuario no encontrado');
   }
 
-  async getProfile(userId: number) {
-    return this.usuarioService.findById(userId);
+  const ok = await bcrypt.compare(contrasenia, usuario.contrasenia);
+
+  if (!ok) {
+    throw new UnauthorizedException('Contraseña incorrecta');
   }
+
+  const token = this.jwtService.sign({
+    sub: usuario.id,
+    correo: usuario.correo,
+  });
+
+  return {
+    access_token: token,
+    usuario,
+  };
+}
 }

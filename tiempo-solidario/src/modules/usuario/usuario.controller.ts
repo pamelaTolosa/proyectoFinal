@@ -15,27 +15,16 @@ import { Public } from '../../../auth/metadata';
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
+  // =========================
+  // LISTAR USUARIOS
+  // =========================
   @Get()
-findAll() {
-  return this.usuarioService.getService();
-}
-
-  // =========================
-  // LOGIN
-  // =========================
-  @Post('login')
-  login(
-    @Body()
-    body: {
-      correo: string;
-      contrasenia: string;
-    },
-  ) {
-    return this.usuarioService.login(body.correo, body.contrasenia);
+  findAll() {
+    return this.usuarioService.getService();
   }
 
   // =========================
-  // CREATE USER
+  // CREAR USUARIO
   // =========================
   @Public()
   @Post()
