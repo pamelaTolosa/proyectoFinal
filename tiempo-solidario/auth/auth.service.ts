@@ -8,37 +8,39 @@ export class AuthService {
   constructor(
     private readonly usuarioService: UsuarioService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
- async signIn(correo: string, contrasenia: string) {
-  console.log("LOGIN HIT:", correo);
+  async signIn(correo: string, contrasenia: string) {
+    console.log("➡ LOGIN HIT");
 
-  const usuario = await this.usuarioService.findByEmail(correo);
-  console.log("USER:", usuario);
+    const usuario = await this.usuarioService.findByEmail(correo);
+    console.log("➡ USER:", usuario);
 
-  if (!usuario) {
-    throw new UnauthorizedException('Usuario no encontrado');
+    if (!usuario) {
+      console.log("❌ USER NOT FOUND");
+      throw new UnauthorizedException();
+    }
+
+    const ok = await bcrypt.compare(contrasenia, usuario.contrasenia);
+    console.log("➡ PASSWORD OK:", ok);
+
+    if (!ok) {
+      console.log("❌ PASSWORD FAIL");
+      throw new UnauthorizedException();
+    }
+
+    const token = this.jwtService.sign({
+      sub: usuario.id,
+      correo: usuario.correo,
+    });
+
+    const result = {
+      access_token: token,
+      usuario,
+    };
+
+    console.log("✅ RETURN:", result);
+
+    return result;
   }
-
-  const ok = await bcrypt.compare(contrasenia, usuario.contrasenia);
-  console.log("PASSWORD OK:", ok);
-
-  if (!ok) {
-    throw new UnauthorizedException('Contraseña incorrecta');
-  }
-
-  const token = this.jwtService.sign({
-    sub: usuario.id,
-    correo: usuario.correo,
-  });
-
-  const result = {
-    access_token: token,
-    usuario,
-  };
-
-  console.log("RETURN:", result);
-
-  return result;
-}
 }
