@@ -146,5 +146,9 @@ async findById(id: number) {
     where: { id },
   });
 }
-
+async findByEmail(correo: string) {
+  return this.usersRepository.findOne({
+    where: { correo },
+  });
+}
 }

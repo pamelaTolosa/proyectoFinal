@@ -1,44 +1,40 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from '../src/modules/usuario/usuario.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usuarioService: UsuarioService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
-  async signIn(
-  correo: string,
-  contrasenia: string,
-) {
-  const user =
-    await this.usuarioService.findByCorreo(correo);
+  async signIn(correo: string, contrasenia: string) {
+    const usuario = await this.usuarioService.findByEmail(correo);
 
-  if (!user || user.contrasenia !== contrasenia) {
-    throw new UnauthorizedException();
+    if (!usuario) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
+
+    const ok = await bcrypt.compare(contrasenia, usuario.contrasenia);
+
+    if (!ok) {
+      throw new UnauthorizedException('Contraseña incorrecta');
+    }
+
+    const token = this.jwtService.sign({
+      sub: usuario.id,
+      correo: usuario.correo,
+    });
+
+    return {
+      access_token: token,
+      usuario,
+    };
   }
 
-  const payload = {
-    sub: user.id,
-    username: user.nombre,
-  };
-
-  const access_token =
-    await this.jwtService.signAsync(payload);
-
-  return {
-    access_token,
-    usuario: {
-      id: user.id,
-      nombre: user.nombre,
-      apellido: user.apellido,
-      correo: user.correo,
-    },
-  };
-}
-async getProfile(userId: number) {
-  return this.usuarioService.findById(userId);
-}
+  async getProfile(userId: number) {
+    return this.usuarioService.findById(userId);
+  }
 }
