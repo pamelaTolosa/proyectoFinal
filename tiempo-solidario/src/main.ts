@@ -26,7 +26,7 @@ async function bootstrap() {
   // 🔥 CORS
   app.enableCors({
   origin: [
-    "https://proyectofinal-1-qzvx.onrender.com",
+    "hhttps://proyectofinal-1-qzvx.onrender.com",
     "http://localhost:5173",
   ],
   credentials: true,
