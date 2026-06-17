@@ -21,7 +21,7 @@ export class UsuarioService {
 
     @InjectRepository(RegistroHoras)
     private registroRepository: Repository<RegistroHoras>,
-  ) {}
+  ) { }
 
   // =========================
   // LISTAR USUARIOS (SAFE)
@@ -70,7 +70,13 @@ export class UsuarioService {
       throw new ConflictException('El DNI ya está registrado');
     }
 
-    const hashedPassword = await bcrypt.hash(userDto.contrasenia, 10);
+    const hashedPassword = await bcrypt.hash(
+      userDto.contrasenia,
+      10,
+    );
+
+    console.log('PASSWORD ORIGINAL:', userDto.contrasenia);
+    console.log('HASH GENERADO:', hashedPassword);
 
     const user = this.usersRepository.create({
       ...userDto,
