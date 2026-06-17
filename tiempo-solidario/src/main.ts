@@ -30,6 +30,7 @@ async function bootstrap() {
     ],
     credentials: true,
   });
+console.log('CORS CONFIGURADO PARA RENDER');
 
   await app.listen(process.env.PORT || 3000);
 }
