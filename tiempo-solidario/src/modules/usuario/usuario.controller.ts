@@ -55,4 +55,8 @@ export class UsuarioController {
   findByDni(@Param('dni') dni: string) {
     return this.usuarioService.findByDni(dni);
   }
+  @Post('login')
+login(@Body() body: { correo: string; contrasenia: string }) {
+  return this.usuarioService.login(body.correo, body.contrasenia);
+}
 }

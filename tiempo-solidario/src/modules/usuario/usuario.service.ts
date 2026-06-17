@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { RegistroHoras } from '../registro-horas/entities/registro-horas.entity';
 import { Usuario } from './entities/usuario.entity';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsuarioService {
@@ -50,27 +51,33 @@ export class UsuarioService {
   // =========================
   // CREAR USUARIO
   // =========================
-  async postService(userDto: CreateUsuarioDto) {
-    const existingCorreo = await this.usersRepository.findOne({
-      where: { correo: userDto.correo },
-    });
+ async postService(userDto: CreateUsuarioDto) {
+  const existingCorreo = await this.usersRepository.findOne({
+    where: { correo: userDto.correo },
+  });
 
-    if (existingCorreo) {
-      throw new ConflictException('El correo ya está registrado');
-    }
-
-    const existingDni = await this.usersRepository.findOne({
-      where: { dni: userDto.dni },
-    });
-
-    if (existingDni) {
-      throw new ConflictException('El DNI ya está registrado');
-    }
-
-    const user = this.usersRepository.create(userDto);
-
-    return this.usersRepository.save(user);
+  if (existingCorreo) {
+    throw new ConflictException('El correo ya está registrado');
   }
+
+  const existingDni = await this.usersRepository.findOne({
+    where: { dni: userDto.dni },
+  });
+
+  if (existingDni) {
+    throw new ConflictException('El DNI ya está registrado');
+  }
+
+  // 🔐 HASH DE CONTRASEÑA
+  const hashedPassword = await bcrypt.hash(userDto.contrasenia, 10);
+
+  const user = this.usersRepository.create({
+    ...userDto,
+    contrasenia: hashedPassword,
+  });
+
+  return this.usersRepository.save(user);
+}
 
   // =========================
   // FIND ONE
@@ -124,5 +131,22 @@ async findByEmail(correo: string) {
   return this.usersRepository.findOne({
     where: { correo },
   });
+}
+async login(correo: string, password: string) {
+  const user = await this.usersRepository.findOne({
+    where: { correo },
+  });
+
+  if (!user) {
+    throw new NotFoundException('Usuario no encontrado');
+  }
+
+  const isValid = await bcrypt.compare(password, user.contrasenia);
+
+  if (!isValid) {
+    throw new ConflictException('Contraseña incorrecta');
+  }
+
+  return user;
 }
 }
