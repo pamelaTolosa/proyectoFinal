@@ -9,7 +9,12 @@ import { AuthModule } from '../../auth/auth.module';
 
 dotenv.config();
 
-console.log(process.env.DB_USER);
+console.log({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  username: process.env.DB_USERNAME,
+  database: process.env.DB_NAME,
+});
 
 @Module({
   imports: [
