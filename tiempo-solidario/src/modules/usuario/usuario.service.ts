@@ -26,14 +26,23 @@ export class UsuarioService {
   // =========================
   // LISTAR USUARIOS (SAFE)
   // =========================
-  async getService(): Promise<Usuario[]> {
-    try {
-      return await this.usersRepository.find();
-    } catch (error) {
-      console.error('ERROR getService:', error);
-      throw new Error('Error al obtener usuarios');
-    }
+ async getService(): Promise<Partial<Usuario>[]> {
+  try {
+    return await this.usersRepository.find({
+      select: {
+        id: true,
+        nombre: true,
+        apellido: true,
+        correo: true,
+        foto: true,
+        acercaDeMi: true,
+      },
+    });
+  } catch (error) {
+    console.error('ERROR getService:', error);
+    throw new Error('Error al obtener usuarios');
   }
+}
 
   // =========================
   // BUSCAR POR DNI

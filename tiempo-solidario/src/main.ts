@@ -16,23 +16,22 @@ async function bootstrap() {
     extended: true,
   }));
 
- app.useGlobalPipes(
-  new ValidationPipe({
-    whitelist: true,
-    transform: true,
-  }),
-);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
 
-  // 🔥 CORS
   app.enableCors({
-  origin: [
-    "hhttps://proyectofinal-1-qzvx.onrender.com",
-    "http://localhost:5173",
-  ],
-  credentials: true,
-});
+    origin: [
+      'http://localhost:5173',
+      'https://tiemposolidario.onrender.com',
+    ],
+    credentials: true,
+  });
 
-await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT || 3000);
 }
 
 bootstrap();
