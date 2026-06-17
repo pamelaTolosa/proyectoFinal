@@ -1,6 +1,7 @@
 import {
   Injectable,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -28,7 +29,16 @@ export class ValoracionService {
       usuarioQueValora: { id: usuarioQueValoraId } as any,
       usuarioValorado: { id: usuarioValoradoId } as any,
     });
+const existing = await this.valoracionRepository.findOne({
+  where: {
+    usuarioQueValora: { id: usuarioQueValoraId },
+    usuarioValorado: { id: usuarioValoradoId },
+  },
+});
 
+if (existing) {
+  throw new ConflictException('Ya valoraste a este usuario');
+}
     try {
       return await this.valoracionRepository.save(valoracion);
     } catch (error) {
