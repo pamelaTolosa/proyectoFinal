@@ -5,7 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
-
+  console.log("🚀 VERSION DEBUG LOGIN");
   const app = await NestFactory.create(AppModule);
 
   // 🔥 AUMENTAR LÍMITE
