@@ -12,7 +12,6 @@ import { Valoracion } from '../../valoraciones/entities/valoraciones.entity';
 
 @Entity()
 export class Usuario {
-
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -22,37 +21,39 @@ export class Usuario {
   @Column()
   apellido!: string;
 
-  @Column({
-    unique: true,
-  })
+  @Column({ unique: true })
   dni!: string;
 
-  @Column({
-    type: 'longtext',
-    nullable: true,
-  })
+  @Column({ type: 'longtext', nullable: true })
   foto!: string;
 
   @Column()
   fecha_de_nacimiento!: string;
 
-  @Column({
-    unique: true,
-  })
+  @Column({ unique: true })
   correo!: string;
 
-  @Column({
-    type: 'text',
-    nullable: true,
-  })
+  @Column({ type: 'text', nullable: true })
   acercaDeMi!: string;
 
   @Column()
   contrasenia!: string;
 
-  // =========================
-  // CURSOS
-  // =========================
+  // ✅ CAMPOS DE PROMEDIO (AGREGADOS)
+  @Column({ 
+    type: 'decimal', 
+    precision: 3, 
+    scale: 2, 
+    default: 0 
+  })
+  promedio!: number;
+
+  @Column({ 
+    type: 'int', 
+    default: 0,
+    name: 'cantidad_valoraciones'
+  })
+  cantidad_valoraciones!: number;
 
   @OneToMany(
     () => Course,
@@ -92,15 +93,19 @@ export class Usuario {
   )
   mensajesRecibidos!: Mensaje[];
 
-  @OneToMany(
-  () => Valoracion,
-  (valoracion) => valoracion.usuarioQueValora,
-)
-valoracionesHechas!: Valoracion[];
+  // =========================
+  // VALORACIONES
+  // =========================
 
-@OneToMany(
-  () => Valoracion,
-  (valoracion) => valoracion.usuarioValorado,
-)
-valoracionesRecibidas!: Valoracion[];
+  @OneToMany(
+    () => Valoracion,
+    (valoracion) => valoracion.usuarioQueValora,
+  )
+  valoracionesHechas!: Valoracion[];
+
+  @OneToMany(
+    () => Valoracion,
+    (valoracion) => valoracion.usuarioValorado,
+  )
+  valoracionesRecibidas!: Valoracion[];
 }
