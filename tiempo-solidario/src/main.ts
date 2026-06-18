@@ -24,7 +24,11 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin:true,
+    origin: [
+      'http://localhost:5173',
+      'https://tiemposolidario.onrender.com',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   });
 console.log('CORS CONFIGURADO PARA RENDER');
