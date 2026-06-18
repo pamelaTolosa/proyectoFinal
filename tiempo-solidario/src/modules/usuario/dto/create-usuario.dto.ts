@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateUsuarioDto {
 
@@ -17,8 +17,9 @@ export class CreateUsuarioDto {
   @IsString()
   contrasenia!: string;
 
+  @IsOptional() // ✅ Hacer opcional
   @IsString()
-  fecha_de_nacimiento!: string;
+  fecha_de_nacimiento?: string;
 
   @IsString()
   acercaDeMi!: string;
