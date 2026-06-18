@@ -20,7 +20,7 @@ console.log('DATABASE_URL:', process.env.DATABASE_URL);
       url: process.env.DATABASE_URL,
 
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false,
       logging: true,
     }),
 
