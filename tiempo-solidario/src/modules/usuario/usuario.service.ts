@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -36,9 +37,11 @@ export class UsuarioService {
           correo: true,
           foto: true,
           acercaDeMi: true,
+          promedio: true,
+          cantidad_valoraciones: true,
         },
         relations: {
-          cursos: true, // 🟢 Trae los cursos vinculados para la pantalla de Matcheo
+          cursos: true,
         },
       });
     } catch (error) {
@@ -62,10 +65,26 @@ export class UsuarioService {
     return usuario;
   }
 
-  // =========================
-  // CREAR USUARIO (COMPLETAMENTE BLINDADO)
-  // =========================
   async postService(userDto: CreateUsuarioDto) {
+    // Validar fecha de nacimiento
+    if (!userDto.fecha_de_nacimiento) {
+      throw new BadRequestException('La fecha de nacimiento es requerida');
+    }
+
+    // Validar edad (mayor de 18 años)
+    const fechaNac = new Date(userDto.fecha_de_nacimiento);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNac.getFullYear();
+    const mes = hoy.getMonth() - fechaNac.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+      edad--;
+    }
+
+    if (edad < 18) {
+      throw new BadRequestException('Debes ser mayor de 18 años para registrarte');
+    }
+
+    // Verificar correo existente
     const existingCorreo = await this.usersRepository.findOne({
       where: { correo: userDto.correo },
     });
@@ -74,6 +93,7 @@ export class UsuarioService {
       throw new ConflictException('El correo ya está registrado');
     }
 
+    // Verificar DNI existente
     const existingDni = await this.usersRepository.findOne({
       where: { dni: userDto.dni },
     });
@@ -82,23 +102,26 @@ export class UsuarioService {
       throw new ConflictException('El DNI ya está registrado');
     }
 
-    // Hasheamos ÚNICAMENTE la contraseña
+    // Hashear contraseña
     const hashedPassword = await bcrypt.hash(userDto.contrasenia, 10);
 
-    // Mapeo explícito paso a paso para evitar que el operador `...` propague errores
+    // ✅ Crear usuario SIN el campo 'activo'
     const user = this.usersRepository.create({
       nombre: userDto.nombre,
       apellido: userDto.apellido,
       dni: userDto.dni,
       correo: userDto.correo,
-      foto: userDto.foto,
-      acercaDeMi: userDto.acercaDeMi, // Pasa limpio como texto plano
-      contrasenia: hashedPassword,    // Único campo con hash
-    });
+      contrasenia: hashedPassword,
+      fecha_de_nacimiento: userDto.fecha_de_nacimiento,
+      foto: userDto.foto || null,
+      acercaDeMi: userDto.acercaDeMi || null,
+      promedio: 0,
+      cantidad_valoraciones: 0,
+      // ✅ activo: true,  // <-- ELIMINADO
+    } as any);
 
     return this.usersRepository.save(user);
   }
-
   // =========================
   // LOGIN (SEGURO)
   // =========================
@@ -133,9 +156,12 @@ export class UsuarioService {
         foto: true,
         acercaDeMi: true,
         correo: true,
+        fecha_de_nacimiento: true,
+        promedio: true,
+        cantidad_valoraciones: true,
       },
       relations: {
-        cursos: true, // 🟢 Trae los cursos vinculados para la vista de Mi Perfil
+        cursos: true,
       },
     });
 
@@ -165,6 +191,27 @@ export class UsuarioService {
   }
 
   // =========================
+  // ACTUALIZAR USUARIO
+  // =========================
+  async update(id: number, updateData: Partial<Usuario>) {
+    const usuario = await this.usersRepository.findOne({
+      where: { id },
+    });
+
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    // Si se actualiza la contraseña, hashearla
+    if (updateData.contrasenia) {
+      updateData.contrasenia = await bcrypt.hash(updateData.contrasenia, 10);
+    }
+
+    Object.assign(usuario, updateData);
+    return this.usersRepository.save(usuario);
+  }
+
+  // =========================
   // SALDO
   // =========================
   async getSaldo(usuarioId: number): Promise<number> {
@@ -180,5 +227,20 @@ export class UsuarioService {
       if (r?.receptor?.id === usuarioId) return total - r.horas;
       return total;
     }, 0);
+  }
+
+  // =========================
+  // ELIMINAR USUARIO
+  // =========================
+  async delete(id: number) {
+    const usuario = await this.usersRepository.findOne({
+      where: { id },
+    });
+
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return this.usersRepository.remove(usuario);
   }
 }
