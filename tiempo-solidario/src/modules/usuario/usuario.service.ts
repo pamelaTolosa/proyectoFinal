@@ -24,25 +24,28 @@ export class UsuarioService {
   ) { }
 
   // =========================
-  // LISTAR USUARIOS (SAFE)
+  // LISTAR USUARIOS (CON CURSOS)
   // =========================
- async getService(): Promise<Partial<Usuario>[]> {
-  try {
-    return await this.usersRepository.find({
-      select: {
-        id: true,
-        nombre: true,
-        apellido: true,
-        correo: true,
-        foto: true,
-        acercaDeMi: true,
-      },
-    });
-  } catch (error) {
-    console.error('ERROR getService:', error);
-    throw new Error('Error al obtener usuarios');
+  async getService(): Promise<Partial<Usuario>[]> {
+    try {
+      return await this.usersRepository.find({
+        select: {
+          id: true,
+          nombre: true,
+          apellido: true,
+          correo: true,
+          foto: true,
+          acercaDeMi: true,
+        },
+        relations: {
+          cursos: true, // 🟢 Trae los cursos vinculados para la pantalla de Matcheo
+        },
+      });
+    } catch (error) {
+      console.error('ERROR getService:', error);
+      throw new Error('Error al obtener usuarios');
+    }
   }
-}
 
   // =========================
   // BUSCAR POR DNI
@@ -60,7 +63,7 @@ export class UsuarioService {
   }
 
   // =========================
-  // CREAR USUARIO (HASH SEGURO)
+  // CREAR USUARIO (COMPLETAMENTE BLINDADO)
   // =========================
   async postService(userDto: CreateUsuarioDto) {
     const existingCorreo = await this.usersRepository.findOne({
@@ -79,17 +82,18 @@ export class UsuarioService {
       throw new ConflictException('El DNI ya está registrado');
     }
 
-    const hashedPassword = await bcrypt.hash(
-      userDto.contrasenia,
-      10,
-    );
+    // Hasheamos ÚNICAMENTE la contraseña
+    const hashedPassword = await bcrypt.hash(userDto.contrasenia, 10);
 
-    console.log('PASSWORD ORIGINAL:', userDto.contrasenia);
-    console.log('HASH GENERADO:', hashedPassword);
-
+    // Mapeo explícito paso a paso para evitar que el operador `...` propague errores
     const user = this.usersRepository.create({
-      ...userDto,
-      contrasenia: hashedPassword,
+      nombre: userDto.nombre,
+      apellido: userDto.apellido,
+      dni: userDto.dni,
+      correo: userDto.correo,
+      foto: userDto.foto,
+      acercaDeMi: userDto.acercaDeMi, // Pasa limpio como texto plano
+      contrasenia: hashedPassword,    // Único campo con hash
     });
 
     return this.usersRepository.save(user);
@@ -117,7 +121,7 @@ export class UsuarioService {
   }
 
   // =========================
-  // FIND ONE (SIN RELACIONES PROBLEMÁTICAS)
+  // FIND ONE (CON CURSOS PARA PERFIL)
   // =========================
   async findOne(id: number) {
     const usuario = await this.usersRepository.findOne({
@@ -129,6 +133,9 @@ export class UsuarioService {
         foto: true,
         acercaDeMi: true,
         correo: true,
+      },
+      relations: {
+        cursos: true, // 🟢 Trae los cursos vinculados para la vista de Mi Perfil
       },
     });
 
@@ -158,7 +165,7 @@ export class UsuarioService {
   }
 
   // =========================
-  // SALDO (PROTEGIDO ANTE DB VACÍA)
+  // SALDO
   // =========================
   async getSaldo(usuarioId: number): Promise<number> {
     const registros = await this.registroRepository.find({
