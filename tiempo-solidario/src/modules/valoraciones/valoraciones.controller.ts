@@ -88,6 +88,38 @@ async yaValoro(
     usuarioValoradoId,
   );
 }
+@UseGuards(AuthGuard)
+@Get('verificar/:usuarioQueValoraId/:usuarioValoradoId')
+async verificarValoracion(
+  @Param('usuarioQueValoraId', ParseIntPipe)
+  usuarioQueValoraId: number,
+
+  @Param('usuarioValoradoId', ParseIntPipe)
+  usuarioValoradoId: number,
+) {
+  return this.valoracionService.yaValoro(
+    usuarioQueValoraId,
+    usuarioValoradoId,
+  );
+}
+
+@UseGuards(AuthGuard)
+@Get('usuario/:id/valorados')
+async obtenerUsuariosValorados(
+  @Param('id', ParseIntPipe)
+  id: number,
+) {
+  return this.valoracionService.obtenerUsuariosValorados(id);
+}
+@UseGuards(AuthGuard)
+@Get('usuario/:id/recibidas')
+async obtenerValoracionesRecibidas(
+  @Param('id', ParseIntPipe)
+  id: number,
+) {
+  return this.valoracionService.obtenerValoracionesRecibidas(id);
+}
+
 @Get('usuario/:usuarioQueValoraId/:usuarioValoradoId')
 obtenerValoracion(
   @Param('usuarioQueValoraId', ParseIntPipe)
