@@ -18,7 +18,7 @@ console.log('DATABASE_URL:', process.env.DATABASE_URL);
       type: 'mysql',
 
       url: process.env.DATABASE_URL,
-      database: 'airven',
+      database: 'defaultdb',
       autoLoadEntities: true,
       synchronize: false,
       logging: true,
