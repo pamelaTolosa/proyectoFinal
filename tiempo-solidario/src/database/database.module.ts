@@ -18,7 +18,7 @@ console.log('DATABASE_URL:', process.env.DATABASE_URL);
       type: 'mysql',
 
       url: process.env.DATABASE_URL,
-
+      database: 'airven',
       autoLoadEntities: true,
       synchronize: false,
       logging: true,
@@ -29,4 +29,4 @@ console.log('DATABASE_URL:', process.env.DATABASE_URL);
     AuthModule,
   ],
 })
-export class DatabaseModule {}
+export class DatabaseModule { }
